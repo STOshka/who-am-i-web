@@ -29,7 +29,8 @@ class JSONSet extends Set {
 }
 
 const
-    rooms = {};
+    rooms = {},
+    avatars = {};
 
 // Server part
 const app = express();
@@ -48,22 +49,27 @@ const io = socketIo(server);
 
 io.on("connection", socket => {
     let room, user,
-        update = () => {
+        update = (exceptSelf) => {
             const roles = Object.assign({}, room.roles);
             delete room.roles[user];
-            io.to(room.roomId).emit("state", room);
+            if (exceptSelf)
+                socket.broadcast.to(room.roomId).emit("state", room);
+            else
+                io.to(room.roomId).emit("state", room);
             room.roles = roles;
         },
         removePlayer = playerId => {
+            room.players.delete(playerId);
             room.onlinePlayers.delete(playerId);
-            delete room.roles[playerId];
+            delete room.playerNames[playerId];
         },
         getPlayerByName = name => {
-            let playerId;
+            let playerId = null;
             Object.keys(room.playerNames).forEach(userId => {
                 if (room.playerNames[userId] === name)
                     playerId = userId;
             });
+            return playerId;
         };
     socket.on("init", args => {
         socket.join(args.roomId);
@@ -75,11 +81,23 @@ io.on("connection", socket => {
             players: new JSONSet(),
             playerNames: {},
             roles: {},
-            onlinePlayers: new JSONSet()
+            onlinePlayers: new JSONSet(),
+            roleStickers: {}
         };
+        if (!room.players.has(user))
+            socket.emit("request-avatar");
         room.players.add(user);
         room.onlinePlayers.add(user);
         room.playerNames[user] = args.userName;
+        room.roleStickers[user] = room.roleStickers[user] || {x: 0, y: 0};
+        const playerAvatars = {};
+        [...room.players].forEach(player => playerAvatars[player] = avatars[player]);
+        io.to(room.roomId).emit("update-avatars", playerAvatars);
+        update();
+    });
+    socket.on("move-role-sticker", (player, position) => {
+        const prevPosition = room.roleStickers[player];
+        room.roleStickers[player] = {x: prevPosition.x + position.x, y: prevPosition.y + position.y};
         update();
     });
     socket.on("change-word", (player, word) => {
@@ -108,6 +126,11 @@ io.on("connection", socket => {
         const playerId = getPlayerByName(name);
         if (playerId)
             room.hostId = playerId;
+        update();
+    });
+    socket.on("set-avatar", avatar => {
+        avatars[user] = avatar;
+        io.to(room.roomId).emit("update-avatars", {[user]: avatars[user]});
         update();
     });
     socket.on("disconnect", () => {

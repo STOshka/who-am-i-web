@@ -20,7 +20,7 @@
     right: 0;
     bottom: 0;
     padding: 6px;
-    background: rgb(255, 252, 245);
+    background: rgba(255, 255, 255, 0.74);
     user-select: none;
     cursor: default;
     text-align: right;
@@ -33,7 +33,7 @@
 }
 
 .host-controls-menu > div > div:hover {
-    background: #f4e2e0;
+    background: #bea281;
 }
 
 .host-controls-menu {
@@ -69,23 +69,27 @@
 .player-list {
     display: flex;
     width: 100%;;
-    align-items: center;
-    flex-direction: column;
-    padding: 20px;
+    justify-content: center;
+    flex-direction: row;
+    padding: 40px;
     box-sizing: border-box;
+    flex-wrap: wrap;
 }
 
-.player-row {
+.player-container {
     display: flex;
-    margin-bottom: 13px;
+    border: 1px solid gainsboro;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    margin: 5px;
+    background: rgba(255, 255, 255, 0.74);
 }
 
-input {
-    width: 170px;
-}
-
-.player {
-    width: 110px;
+.role {
+    width: 93px;
+    background: none;
+    border: none;
 }
 
 .notebook {
@@ -94,7 +98,66 @@ input {
     flex-direction: column;
 }
 
-textarea {
-    width: 210px;
+#notebook {
+    width: 190px;
     height: 180px;
+    padding: 8px;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.74);
+    font-size: 14px;
+}
+
+#avatar-input {
+    display: none;
+}
+
+.avatar {
+    width: 190px;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.role-container {
+    position: absolute;
+    padding: 7px;
+    left: 43px;
+    top: 8px;
+    box-shadow: 0 0 5px 1px black;
+    background: rgb(255, 239, 201);
+}
+
+.role-container.transition {
+    transition: transform 0.3s;
+}
+
+.player {
+    padding: 3px;
+    user-select: none;
+}
+
+#background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #0e0e0e url(old-german-bar.jpg) center no-repeat;
+    background-size: cover;
+    filter: blur(0) brightness(1);
+    transition: filter 2s;
+}
+
+#background.blurred {
+    filter: blur(5px) brightness(0.8);
+}
+
+body {
+    margin: 0;
+    background: black;
+}
+
+.kicked {
+    color: white;
+    padding: 22px;
+    text-align: center;
 }
