@@ -113,6 +113,9 @@ class Game extends React.Component {
                             </div>
                         ))}
                     </div>
+                    <div className="notebook">
+                        <textarea/>
+                    </div>
                     <div className="host-controls">
                         <div className="host-controls-menu" onClick={evt => this.handleHostAction(evt)}>
                             {isHost ? (
