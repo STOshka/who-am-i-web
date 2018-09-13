@@ -20,24 +20,16 @@
     right: 0;
     bottom: 0;
     padding: 6px;
-    background: rgba(255, 255, 255, 0.74);
+    background: rgba(255, 252, 245, 0.58);
     user-select: none;
     cursor: default;
     text-align: right;
     z-index: 1;
 }
 
-.host-controls-menu > div > div {
-    padding: 3px 2px;
-    cursor: pointer;
-}
-
-.host-controls-menu > div > div:hover {
-    background: #bea281;
-}
-
 .host-controls-menu {
     display: none;
+    margin-bottom: 9px;
 }
 
 .host-controls:hover .host-controls-menu {
@@ -45,7 +37,19 @@
 }
 
 .settings-button {
-    float: right;
+    cursor: pointer;
+}
+
+.settings-button:hover {
+    background: #d4d4d4;
+}
+
+.side-buttons {
+    display: none;
+}
+
+.host-controls:hover .side-buttons {
+    display: inline-block;
 }
 
 .game-board {
@@ -145,6 +149,7 @@
     background-size: cover;
     filter: blur(0) brightness(1);
     transition: filter 2s;
+    z-index: -1;
 }
 
 #background.blurred {
@@ -160,4 +165,100 @@ body {
     color: white;
     padding: 22px;
     text-align: center;
+}
+
+.spectators-section {
+    display: none;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+
+.spectators-section.active {
+    display: block;
+}
+
+.spectators {
+    display: inline-block;
+    padding: 6px;
+    cursor: pointer;
+    background: rgba(255, 252, 245, 0.58);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.spectators .player {
+    display: inline-block;
+    margin: 0 4px;
+}
+
+.player-host-controls {
+    display: none;
+    vertical-align: middle;
+}
+
+.player-host-controls > * {
+    margin-left: 5px;
+}
+
+.player:hover .player-host-controls, .command:hover .player-host-controls {
+    display: inline-block;
+}
+
+.player .host-button, .command .host-button {
+    font-size: 16px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.join-players-button {
+    z-index: 1;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    padding: 84px;
+    background: #a7a7a740;
+    margin: 5px;
+    padding-top: 90px;
+}
+
+.set-avatar-button, .show-notes-button {
+    display: none;
+}
+
+.set-avatar-button i, .show-notes-button i {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #4c4c4c;
+    background: rgba(255, 255, 255, 0.74);
+    z-index: 2;
+}
+
+.player-container:hover .set-avatar-button, .player-container:hover .show-notes-button {
+    display: block;
+}
+
+.player-notes {
+    display: none;
+}
+
+.show-notes-button:hover .player-notes {
+    display: block;
+}
+
+.player-notes {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.74);
+    z-index: 1;
+    text-align: left;
+    padding: 10px;
+    white-space: pre;
+    overflow: auto;
 }
