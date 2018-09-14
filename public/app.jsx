@@ -230,7 +230,8 @@ class Game extends React.Component {
             const
                 data = this.state,
                 isHost = data.hostId === data.userId,
-                isPlayer = !!~data.players.indexOf(data.userId);
+                isPlayer = !!~data.players.indexOf(data.userId),
+                parentDir = location.pathname.match(/(.+?)\//)[1];
             return (
                 <div className="game">
                     <div id="background"/>
