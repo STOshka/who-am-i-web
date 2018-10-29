@@ -189,24 +189,6 @@ function init(wsServer, path, vkToken) {
         }
     }
 
-    function makeId() {
-        let text = "";
-        const possible = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-        for (let i = 0; i < 5; i++)
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        return text;
-    }
-
-    function shuffleArray(array) {
-        array.sort(() => (Math.random() - 0.5));
-        return array;
-    }
-
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
     class JSONSet extends Set {
         constructor(iterable) {
             super(iterable)

@@ -89,9 +89,13 @@ class Game extends React.Component {
         initArgs.token = this.userToken = localStorage.whoAmIUserToken;
         initArgs.userName = localStorage.userName;
         this.socket = window.socket.of("who-am-i");
-        this.socket.on("state", state => this.setState(Object.assign({
-            userId: this.userId
-        }, state)));
+        this.socket.on("state", (state) => {
+            if (!this.state.inited && state.inited)
+                setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
+            this.setState(Object.assign({
+                userId: this.userId
+            }, state))
+        });
         this.socket.on("roles", (player, word) => {
             if (this.userId !== player)
                 document.getElementById(player).value = word;
@@ -145,7 +149,6 @@ class Game extends React.Component {
         this.socket.on("ping", (id) => {
             this.socket.emit("pong", id);
         });
-        setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
     }
 
     constructor() {
