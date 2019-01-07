@@ -163,7 +163,14 @@ class Game extends React.Component {
     }
 
     handleNotesChange(id, value) {
-        this.socket.emit("change-notes", id, value);
+        this.debouncedEmit("change-notes", id, value);
+    }
+
+    debouncedEmit(event, a1, a2) {
+        clearTimeout(this.debouncedEmitTimer);
+        this.debouncedEmitTimer = setTimeout(() => {
+            this.socket.emit(event, a1, a2);
+        }, 1000);
     }
 
     handleRemovePlayer(id, evt) {
@@ -219,8 +226,7 @@ class Game extends React.Component {
                 fd.append("userId", this.userId);
                 fd.append("userToken", this.userToken);
                 xhr.send(fd);
-            }
-            else
+            } else
                 alert("File shouldn't be larger than 5 MB");
         }
     }
@@ -289,7 +295,7 @@ class Game extends React.Component {
                         {isPlayer ? (<div className="notebook">
                         <textarea id="notebook"
                                   placeholder="notes"
-                                  value={data.playerNotes[data.userId]}
+                                  defaultValue={data.playerNotes[data.userId]}
                                   onChange={(event => this.handleNotesChange(event.target.value))}/>
                         </div>) : ""}
                         <div className={
@@ -319,8 +325,7 @@ class Game extends React.Component {
                     </div>
                 </div>
             );
-        }
-        else return (<div/>);
+        } else return (<div/>);
     }
 }
 
