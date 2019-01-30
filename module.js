@@ -57,12 +57,14 @@ function init(wsServer, path, vkToken) {
                 send = (target, event, data) => userRegistry.send(target, event, data),
                 update = () => send(room.onlinePlayers, "state", room),
                 removePlayer = (playerId) => {
-                    if (room.spectators.has(playerId))
-                        registry.disconnectUser(playerId, "Kicked");
-                    else {
-                        room.players.delete(playerId);
-                        room.spectators.add(playerId);
+                    room.players.delete(playerId);
+                    if (room.spectators.has(playerId) || !room.onlinePlayers.has(playerId)) {
+                        room.spectators.delete(playerId);
+                        delete room.playerNames[playerId];
+                        registry.disconnect(playerId, "You was removed");
                     }
+                    else
+                        room.spectators.add(playerId);
                 },
                 userJoin = (data) => {
                     const user = data.userId;
@@ -182,7 +184,7 @@ function init(wsServer, path, vkToken) {
 
         setSnapshot(snapshot) {
             Object.assign(this.room, snapshot.room);
-            this.room.onlinePlayers = new JSONSet(this.room.onlinePlayers);
+            this.room.onlinePlayers = new JSONSet();
             this.room.players = new JSONSet(this.room.players);
             this.room.spectators = new JSONSet(this.room.spectators);
             this.room.onlinePlayers.clear();
