@@ -149,6 +149,9 @@ class Game extends React.Component {
         this.socket.on("ping", (id) => {
             this.socket.emit("pong", id);
         });
+        this.socket.on("message", text => {
+            alert(text);
+        });
     }
 
     constructor() {
