@@ -264,3 +264,11 @@ body {
     white-space: pre;
     overflow: auto;
 }
+
+.popup_modals .modal_buttons .btn.btn_pmry {
+    background-color: #9c8370 !important;
+}
+
+.popup_modals .modal_buttons .btn.btn_sdry {
+    background-color: #a0a0a0 !important;
+}
