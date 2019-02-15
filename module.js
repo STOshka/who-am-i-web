@@ -185,8 +185,8 @@ function init(wsServer, path, vkToken) {
         setSnapshot(snapshot) {
             Object.assign(this.room, snapshot.room);
             this.room.onlinePlayers = new JSONSet();
+            this.room.spectators = new JSONSet();
             this.room.players = new JSONSet(this.room.players);
-            this.room.spectators = new JSONSet(this.room.spectators);
             this.room.onlinePlayers.clear();
         }
     }
