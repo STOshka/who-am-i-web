@@ -49,7 +49,8 @@ function init(wsServer, path, vkToken) {
                     playerAvatars: {},
                     roles: {},
                     roleStickers: {},
-                    playerNotes: {}
+                    playerNotes: {},
+                    currentPlayer: null
                 };
             this.room = room;
             this.lastInteraction = new Date();
@@ -63,8 +64,21 @@ function init(wsServer, path, vkToken) {
                         delete room.playerNames[playerId];
                         registry.disconnect(playerId, "You was removed");
                     }
-                    else
+                    else {
+                        if (room.currentPlayer === playerId)
+                            nextPlayer();
                         room.spectators.add(playerId);
+                    }
+                },
+                nextPlayer = () => {
+                    if (!room.currentPlayer)
+                        room.currentPlayer = [...room.players][0];
+                    else {
+                        let nextPlayerIndex = [...room.players].indexOf(room.currentPlayer) + 1;
+                        if (![...room.players][nextPlayerIndex])
+                            nextPlayerIndex = 0;
+                        room.currentPlayer = [...room.players][nextPlayerIndex];
+                    }
                 },
                 userJoin = (data) => {
                     const user = data.userId;
@@ -134,6 +148,8 @@ function init(wsServer, path, vkToken) {
                     if (!room.teamsLocked) {
                         room.spectators.delete(user);
                         room.players.add(user);
+                        if (room.players.size === 1)
+                            room.currentPlayer = user;
                         update();
                     }
                 },
@@ -141,6 +157,8 @@ function init(wsServer, path, vkToken) {
                     if (!room.teamsLocked) {
                         room.players.delete(user);
                         room.spectators.add(user);
+                        if (room.currentPlayer === user)
+                            nextPlayer();
                         update();
                     }
                 },
@@ -159,6 +177,16 @@ function init(wsServer, path, vkToken) {
                         const prevPosition = room.roleStickers[player];
                         room.roleStickers[player] = {x: prevPosition.x + position.x, y: prevPosition.y + position.y};
                     }
+                    update();
+                },
+                "set-current-player": (user, player) => {
+                    if (room.players.has(player) && user === room.hostId)
+                        room.currentPlayer = player;
+                    update();
+                },
+                "end-turn": (user) => {
+                    if (room.currentPlayer === user)
+                        nextPlayer();
                     update();
                 }
             };

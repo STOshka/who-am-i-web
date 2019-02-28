@@ -272,3 +272,28 @@ body {
 .popup_modals .modal_buttons .btn.btn_sdry {
     background-color: #a0a0a0 !important;
 }
+
+.turn-marker.material-icons {
+    position: absolute;
+}
+
+.turn-marker {
+    position: absolute;
+    text-shadow: 0 0 9px #ff7722;
+    color: #403f3f;
+}
+
+.player-container.current-player {
+    box-shadow: 0 0 13px 0 #ff7722;
+}
+
+.end-turn-button {
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: rgba(255, 252, 245, 0.58);
+    box-shadow: 0 0 13px 0 #ff7722;
+}

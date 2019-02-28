@@ -16,11 +16,7 @@ class Player extends React.Component {
             data = this.props.data,
             id = this.props.id;
         return (
-            <div className={
-                "player"
-                + (!~data.onlinePlayers.indexOf(id) ? " offline" : "")
-                + (id === data.userId ? " self" : "")
-            }
+            <div className={cs("player", {offline: !~data.onlinePlayers.indexOf(id), self: id === data.userId})}
                  data-playerId={id}>
                 {data.playerNames[id]}
                 <div className="player-host-controls">
@@ -29,6 +25,13 @@ class Player extends React.Component {
                            title="Give host"
                            onClick={(evt) => this.props.handleGiveHost(id, evt)}>
                             vpn_key
+                        </i>
+                    ) : ""}
+                    {(data.hostId === data.userId && id !== data.currentPlayer && !~data.spectators.indexOf(id)) ? (
+                        <i className="material-icons host-button"
+                           title="Set turn"
+                           onClick={(evt) => this.props.handleSetPlayer(id, evt)}>
+                            reply
                         </i>
                     ) : ""}
                     {(data.hostId === data.userId && data.userId !== id) ? (
@@ -92,6 +95,9 @@ class Game extends React.Component {
         this.socket.on("state", (state) => {
             if (!this.state.inited && state.inited)
                 setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
+            if (this.state.inited && !~this.state.spectators.indexOf(this.userId)
+                && this.state.currentPlayer !== this.userId && state.currentPlayer === this.userId)
+                this.turnSound.play();
             this.setState(Object.assign({
                 userId: this.userId
             }, state))
@@ -152,6 +158,8 @@ class Game extends React.Component {
         this.socket.on("message", text => {
             popup.alert({content: text});
         });
+        this.turnSound = new Audio("/who-am-i/chime.mp3");
+        this.turnSound.volume = 0.8;
     }
 
     constructor() {
@@ -179,6 +187,11 @@ class Game extends React.Component {
     handleRemovePlayer(id, evt) {
         evt.stopPropagation();
         popup.confirm({content: `Removing ${this.state.playerNames[id]}?`}, (evt) => evt.proceed && this.socket.emit("remove-player", id));
+    }
+
+    handleSetPlayer(id, evt) {
+        evt.stopPropagation();
+        this.socket.emit("set-current-player", id);
     }
 
     handleGiveHost(id, evt) {
@@ -237,6 +250,10 @@ class Game extends React.Component {
         }
     }
 
+    handleClickEndTurn() {
+        this.socket.emit("end-turn");
+    }
+
     render() {
         if (this.state.disconnected)
             return (<div
@@ -250,13 +267,13 @@ class Game extends React.Component {
             return (
                 <div className="game">
                     <div id="background"/>
-                    <div className={
-                        "game-board"
-                        + (this.state.inited ? " active" : "")
-                    }>
+                    <div className={cs("game-board", {active: this.state.inited})}>
                         <div className="player-list">
                             {data.players.map(player => (
-                                <div className="player-container">
+                                <div
+                                    className={cs("player-container", {"current-player": player === data.currentPlayer})}>
+                                    {data.currentPlayer === player ? (
+                                        <i className="turn-marker material-icons">star</i>) : ""}
                                     {player === data.userId
                                         ? (<div className="set-avatar-button">
                                             <i onClick={() => this.handleClickSetAvatar()}
@@ -275,6 +292,7 @@ class Game extends React.Component {
                                                  : "default-user.png"})`
                                          }}/>
                                     <Player id={player} data={data}
+                                            handleSetPlayer={(id, evt) => this.handleSetPlayer(id, evt)}
                                             handleRemovePlayer={(id, evt) => this.handleRemovePlayer(id, evt)}
                                             handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)}/>
                                     <div
@@ -285,6 +303,7 @@ class Game extends React.Component {
                                         data-y={data.roleStickers[player].y}
                                     >
                                         <input className="role"
+                                               autoComplete="off"
                                                type={player === data.userId && data.roles[player] ? "password" : "text"}
                                                disabled={!isPlayer || player === data.userId}
                                                id={player}
@@ -304,10 +323,11 @@ class Game extends React.Component {
                                   defaultValue={data.playerNotes[data.userId]}
                                   onChange={(event => this.handleNotesChange(event.target.value))}/>
                         </div>) : ""}
-                        <div className={
-                            "spectators-section"
-                            + ((data.spectators.length > 0 || !data.teamsLocked) ? " active" : "")
-                        }>
+                        {data.currentPlayer === data.userId ? (
+                            <div className="end-turn-button" onClick={() => this.handleClickEndTurn()}>End
+                                turn</div>) : ""}
+                        <div
+                            className={cs("spectators-section", {active: data.spectators.length > 0 || !data.teamsLocked})}>
                             <Spectators data={this.state}
                                         handleSpectatorsClick={() => this.handleSpectatorsClick()}
                                         handleRemovePlayer={(id, evt) => this.handleRemovePlayer(id, evt)}
