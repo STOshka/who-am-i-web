@@ -17,6 +17,7 @@ class Player extends React.Component {
             id = this.props.id;
         return (
             <div className={cs("player", {offline: !~data.onlinePlayers.indexOf(id), self: id === data.userId})}
+                 onTouchStart={(e) => e.target.focus()}
                  data-playerId={id}>
                 {data.playerNames[id]}
                 <div className="player-host-controls">
@@ -271,6 +272,7 @@ class Game extends React.Component {
                         <div className="player-list">
                             {data.players.map(player => (
                                 <div
+                                    onTouchStart={(e) => e.target.focus()}
                                     className={cs("player-container", {"current-player": player === data.currentPlayer})}>
                                     {data.currentPlayer === player ? (
                                         <i className="turn-marker material-icons">star</i>) : ""}
@@ -279,7 +281,7 @@ class Game extends React.Component {
                                             <i onClick={() => this.handleClickSetAvatar()}
                                                className="toggle-theme material-icons settings-button">edit</i>
                                         </div>)
-                                        : (<div className="show-notes-button">
+                                        : (<div className="show-notes-button" onTouchStart={(e) => e.target.focus()}>
                                             <i className="toggle-theme material-icons settings-button">assignment</i>
                                             <div className="player-notes">
                                                 {data.playerNotes[player]}
@@ -334,7 +336,7 @@ class Game extends React.Component {
                                         handleRemovePlayer={(id, evt) => this.handleRemovePlayer(id, evt)}
                                         handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)}/>
                         </div>
-                        <div className="host-controls">
+                        <div className="host-controls" onTouchStart={(e) => e.target.focus()}>
                             <div className="side-buttons">
                                 <i onClick={() => window.location = parentDir}
                                    className="material-icons exit settings-button">exit_to_app</i>

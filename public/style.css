@@ -32,7 +32,7 @@
     margin-bottom: 9px;
 }
 
-.host-controls:hover .host-controls-menu {
+.host-controls:hover .host-controls-menu, .host-controls:focus .host-controls-menu {
     display: block;
 }
 
@@ -48,7 +48,7 @@
     display: none;
 }
 
-.host-controls:hover .side-buttons {
+.host-controls:hover .side-buttons, .host-controls:focus .side-buttons {
     display: inline-block;
 }
 
@@ -204,11 +204,11 @@ body {
     margin-left: 5px;
 }
 
-.player:hover .player-host-controls, .command:hover .player-host-controls {
+.player:hover .player-host-controls, .player:focus .player-host-controls {
     display: inline-block;
 }
 
-.player .host-button, .command .host-button {
+.player .host-button {
     font-size: 16px;
     cursor: pointer;
     vertical-align: middle;
@@ -239,7 +239,8 @@ body {
     z-index: 2;
 }
 
-.player-container:hover .set-avatar-button, .player-container:hover .show-notes-button {
+.player-container:hover .set-avatar-button, .player-container:hover .show-notes-button,
+.player-container:focus .set-avatar-button, .player-container:focus .show-notes-button {
     display: block;
 }
 
@@ -247,7 +248,7 @@ body {
     display: none;
 }
 
-.show-notes-button:hover .player-notes {
+.show-notes-button:hover .player-notes, .show-notes-button:focus .player-notes {
     display: block;
 }
 
