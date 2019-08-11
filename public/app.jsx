@@ -94,8 +94,9 @@ class Game extends React.Component {
         initArgs.userName = localStorage.userName;
         this.socket = window.socket.of("who-am-i");
         this.socket.on("state", (state) => {
+            clearTimeout(this.timerTimeout);
             if (!this.state.inited && state.inited)
-                setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
+                this.timerTimeout = setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
             if (this.state.inited && !~this.state.spectators.indexOf(this.userId)
                 && this.state.currentPlayer !== this.userId && state.currentPlayer === this.userId)
                 this.turnSound.play();
