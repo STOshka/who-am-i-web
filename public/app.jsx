@@ -101,12 +101,17 @@ class Game extends React.Component {
                 && this.state.currentPlayer !== this.userId && state.currentPlayer === this.userId)
                 this.turnSound.play();
             this.setState(Object.assign({
-                userId: this.userId
-            }, state))
+                userId: this.userId,
+                roles: this.state.roles || {},
+                playerNotes: this.state.playerNotes || {}
+            }, state));
         });
-        this.socket.on("roles", (player, word) => {
-            if (this.userId !== player)
-                document.getElementById(player).value = word;
+        this.socket.on("player-state", (state) => {
+            this.setState(Object.assign({}, this.state, state));
+        });
+        this.socket.on("notes", (data) => {
+            this.state.playerNotes[data.user] = data.note;
+            this.setState(this.state);
         });
         window.socket.on("disconnect", (event) => {
             this.setState({
@@ -256,6 +261,10 @@ class Game extends React.Component {
         this.socket.emit("end-turn");
     }
 
+    handleHoverNotes(user) {
+        this.socket.emit("get-notes", user);
+    }
+
     render() {
         if (this.state.disconnected)
             return (<div
@@ -283,7 +292,8 @@ class Game extends React.Component {
                                                className="toggle-theme material-icons settings-button">edit</i>
                                         </div>)
                                         : (<div className="show-notes-button" onTouchStart={(e) => e.target.focus()}>
-                                            <i className="toggle-theme material-icons settings-button">assignment</i>
+                                            <i className="toggle-theme material-icons settings-button"
+                                               onMouseOver={() => this.handleHoverNotes(player)}>assignment</i>
                                             <div className="player-notes">
                                                 {data.playerNotes[player]}
                                             </div>

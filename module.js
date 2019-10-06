@@ -47,24 +47,36 @@ function init(wsServer, path, vkToken) {
                     players: new JSONSet(),
                     teamsLocked: false,
                     playerAvatars: {},
-                    roles: {},
                     roleStickers: {},
-                    playerNotes: {},
                     currentPlayer: null
+                },
+                state = {
+                    roles: {},
+                    playerNotes: {}
                 };
             this.room = room;
+            this.state = state;
             this.lastInteraction = new Date();
             const
-                send = (target, event, data) => userRegistry.send(target, event, data),
+                send = (target, event, data1) => userRegistry.send(target, event, data1),
+                sendState = (user) => {
+                    send(user, "player-state", Object.assign({}, state, {
+                        roles: {
+                            [user]: state.roles[user] ? "**********" : "",
+                            playerNotes: {}
+                        }
+                    }));
+
+                },
                 update = () => send(room.onlinePlayers, "state", room),
+                updateState = () => [...room.onlinePlayers].forEach(sendState),
                 removePlayer = (playerId) => {
                     room.players.delete(playerId);
                     if (room.spectators.has(playerId) || !room.onlinePlayers.has(playerId)) {
                         room.spectators.delete(playerId);
                         delete room.playerNames[playerId];
                         this.emit("user-kicked", playerId);
-                    }
-                    else {
+                    } else {
                         if (room.currentPlayer === playerId)
                             nextPlayer();
                         room.spectators.add(playerId);
@@ -96,6 +108,7 @@ function init(wsServer, path, vkToken) {
                         });
                     }
                     update();
+                    sendState(user);
                 },
                 userLeft = (user) => {
                     room.onlinePlayers.delete(user);
@@ -164,13 +177,15 @@ function init(wsServer, path, vkToken) {
                 },
                 "change-word": (user, player, word) => {
                     if (room.players.has(user) && room.players.has(player))
-                        room.roles[player] = word;
-                    update();
+                        state.roles[player] = word;
+                    updateState();
                 },
                 "change-notes": (user, word) => {
                     if (room.players.has(user))
-                        room.playerNotes[user] = word;
-                    update();
+                        state.playerNotes[user] = word;
+                },
+                "get-notes": (user, userNote) => {
+                    send(user, "notes", {user: userNote, note: state.playerNotes[userNote]});
                 },
                 "move-role-sticker": (user, player, position) => {
                     if (room.players.has(user) && room.players.has(player)) {
@@ -206,12 +221,14 @@ function init(wsServer, path, vkToken) {
 
         getSnapshot() {
             return {
-                room: this.room
+                room: this.room,
+                state: this.state
             };
         }
 
         setSnapshot(snapshot) {
             Object.assign(this.room, snapshot.room);
+            Object.assign(this.state, snapshot.state);
             this.room.onlinePlayers = new JSONSet();
             this.room.spectators = new JSONSet();
             this.room.players = new JSONSet(this.room.players);
