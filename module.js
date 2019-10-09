@@ -60,13 +60,9 @@ function init(wsServer, path, vkToken) {
             const
                 send = (target, event, data1) => userRegistry.send(target, event, data1),
                 sendState = (user) => {
-                    send(user, "player-state", Object.assign({}, state, {
-                        roles: {
-                            [user]: state.roles[user] ? "**********" : "",
-                            playerNotes: {}
-                        }
+                    send(user, "player-state", Object.assign({}, {
+                        roles: Object.assign({}, state.roles, {[user]: state.roles[user] ? "**********" : ""})
                     }));
-
                 },
                 update = () => send(room.onlinePlayers, "state", room),
                 updateState = () => [...room.onlinePlayers].forEach(sendState),
