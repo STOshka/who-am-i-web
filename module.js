@@ -172,7 +172,7 @@ function init(wsServer, path, vkToken) {
                     }
                 },
                 "change-word": (user, player, word) => {
-                    if (room.players.has(user) && room.players.has(player))
+                    if (room.players.has(user) && room.players.has(player) && player !== user)
                         state.roles[player] = word;
                     updateState();
                 },
