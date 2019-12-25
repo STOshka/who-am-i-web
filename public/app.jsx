@@ -92,6 +92,7 @@ class Game extends React.Component {
         initArgs.userId = this.userId = localStorage.whoAmIUserId;
         initArgs.token = this.userToken = localStorage.whoAmIUserToken;
         initArgs.userName = localStorage.userName;
+        initArgs.wssToken = window.wssToken;
         this.socket = window.socket.of("who-am-i");
         this.socket.on("state", (state) => {
             clearTimeout(this.timerTimeout);

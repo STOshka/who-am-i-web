@@ -30,9 +30,7 @@ function init(wsServer, path, vkToken) {
     app.use("/who-am-i", express.static(`${__dirname}/public`));
     if (registry.config.appDir)
         app.use("/who-am-i", express.static(`${registry.config.appDir}/public`));
-    app.get(path, (req, res) => {
-        res.sendFile(`${__dirname}/public/app.html`);
-    });
+    registry.handleAppPage(path, `${__dirname}/public/app.html`);
 
     class GameState extends EventEmitter {
         constructor(hostId, hostData, userRegistry) {
