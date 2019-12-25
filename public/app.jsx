@@ -87,7 +87,9 @@ class Game extends React.Component {
             localStorage.whoAmIUserToken = makeId();
         }
         if (!location.hash)
-            history.replaceState(undefined, undefined, "#" + makeId());
+            history.replaceState(undefined, undefined, location.origin + location.pathname + "#" + makeId());
+        else
+            history.replaceState(undefined, undefined, location.origin + location.pathname + location.hash);
         initArgs.roomId = location.hash.substr(1);
         initArgs.userId = this.userId = localStorage.whoAmIUserId;
         initArgs.token = this.userToken = localStorage.whoAmIUserToken;
