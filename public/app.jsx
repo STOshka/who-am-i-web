@@ -213,6 +213,10 @@ class Game extends React.Component {
         this.socket.emit("toggle-lock");
     }
 
+    handleToggleRoleLockClick() {
+        this.socket.emit("toggle-role-lock");
+    }
+
     handleSpectatorsClick() {
         this.socket.emit("spectators-join");
     }
@@ -321,7 +325,7 @@ class Game extends React.Component {
                                         <input className="role"
                                                autoComplete="off"
                                                type={player === data.userId && data.roles[player] ? "password" : "text"}
-                                               disabled={!isPlayer || player === data.userId}
+                                               disabled={!isPlayer || player === data.userId || data.rolesLocked}
                                                id={player}
                                                value={(player !== data.userId && ~data.players.indexOf(data.userId))
                                                    ? data.roles[player] : (data.roles[player] ? "**********" : "")}
@@ -354,6 +358,11 @@ class Game extends React.Component {
                             <div className="side-buttons">
                                 <i onClick={() => window.location = parentDir}
                                    className="material-icons exit settings-button">exit_to_app</i>
+                                {(isHost || data.rolesLocked) ? (data.rolesLocked
+                                    ? (<i onClick={() => this.handleToggleRoleLockClick()}
+                                          className="material-icons-outlined start-game settings-button">label_off</i>)
+                                    : (<i onClick={() => this.handleToggleRoleLockClick()}
+                                          className="material-icons-outlined start-game settings-button">label</i>)) : ""}
                                 {isHost ? (data.teamsLocked
                                     ? (<i onClick={() => this.handleToggleTeamLockClick()}
                                           className="material-icons start-game settings-button">lock_outline</i>)

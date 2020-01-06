@@ -44,6 +44,7 @@ function init(wsServer, path, vkToken) {
                     onlinePlayers: new JSONSet(),
                     players: new JSONSet(),
                     teamsLocked: false,
+                    rolesLocked: false,
                     playerAvatars: {},
                     roleStickers: {},
                     currentPlayer: null
@@ -134,6 +135,11 @@ function init(wsServer, path, vkToken) {
                         room.teamsLocked = !room.teamsLocked;
                     update();
                 },
+                "toggle-role-lock": (user) => {
+                    if (user === room.hostId)
+                        room.rolesLocked = !room.rolesLocked;
+                    update();
+                },
                 "change-name": (user, value) => {
                     if (value)
                         room.playerNames[user] = value.substr && value.substr(0, 60);
@@ -170,7 +176,7 @@ function init(wsServer, path, vkToken) {
                     }
                 },
                 "change-word": (user, player, word) => {
-                    if (room.players.has(user) && room.players.has(player) && player !== user)
+                    if (room.players.has(user) && room.players.has(player) && player !== user && !room.rolesLocked)
                         state.roles[player] = word;
                     updateState();
                 },
