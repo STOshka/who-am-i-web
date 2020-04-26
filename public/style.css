@@ -298,3 +298,7 @@ body {
     background: rgba(255, 252, 245, 0.58);
     box-shadow: 0 0 13px 0 #ff7722;
 }
+
+.room-main-link {
+    background: rgba(255, 252, 245, 0.58);
+}
