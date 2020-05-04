@@ -358,7 +358,7 @@ class Game extends React.Component {
                         <div className="host-controls" onTouchStart={(e) => e.target.focus()}>
                             <div className="side-buttons">
                                 <i onClick={() => this.socket.emit("set-room-mode", false)}
-                                   className="material-icons exit settings-button">home</i>
+                                   className="material-icons exit settings-button">store</i>
                                 {(isHost || data.rolesLocked) ? (data.rolesLocked
                                     ? (<i onClick={() => this.handleToggleRoleLockClick()}
                                           className="material-icons-outlined start-game settings-button">label_off</i>)
