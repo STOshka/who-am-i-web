@@ -97,6 +97,7 @@ class Game extends React.Component {
         initArgs.wssToken = window.wssToken;
         this.socket = window.socket.of("who-am-i");
         this.socket.on("state", (state) => {
+            CommonRoom.processCommonRoom(state, this.state);
             clearTimeout(this.timerTimeout);
             if (!this.state.inited && state.inited)
                 this.timerTimeout = setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
@@ -243,7 +244,7 @@ class Game extends React.Component {
         if (input.files && input.files[0]) {
             const
                 file = input.files[0],
-                uri = "/who-am-i/upload-avatar",
+                uri = "/common/upload-avatar",
                 xhr = new XMLHttpRequest(),
                 fd = new FormData(),
                 fileSize = ((file.size / 1024) / 1024).toFixed(4); // MB
@@ -356,8 +357,8 @@ class Game extends React.Component {
                         </div>
                         <div className="host-controls" onTouchStart={(e) => e.target.focus()}>
                             <div className="side-buttons">
-                                <i onClick={() => window.location = parentDir}
-                                   className="material-icons exit settings-button">exit_to_app</i>
+                                <i onClick={() => this.socket.emit("set-room-mode", false)}
+                                   className="material-icons exit settings-button">home</i>
                                 {(isHost || data.rolesLocked) ? (data.rolesLocked
                                     ? (<i onClick={() => this.handleToggleRoleLockClick()}
                                           className="material-icons-outlined start-game settings-button">label_off</i>)
@@ -374,7 +375,7 @@ class Game extends React.Component {
                             <i className="settings-hover-button material-icons">settings</i>
                             <input id="avatar-input" type="file" onChange={evt => this.handleSetAvatar(evt)}/>
                         </div>
-                        <CommonRoom state={this.state}/>
+                        <CommonRoom state={this.state} app={this}/>
                     </div>
                 </div>
             );

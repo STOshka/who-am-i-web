@@ -1,40 +1,19 @@
 function init(wsServer, path, vkToken) {
     const
         fs = require("fs"),
-        EventEmitter = require("events"),
         express = require("express"),
-        fileUpload = require("express-fileupload"),
-        exec = require("child_process").exec,
         app = wsServer.app,
         registry = wsServer.users,
         channel = "who-am-i";
 
-    app.post("/who-am-i/upload-avatar", function (req, res) {
-        registry.log(`who-am-i - ${req.body.userId} - upload-avatar`);
-        if (req.files && req.files.avatar && registry.checkUserToken(req.body.userId, req.body.userToken)) {
-            const userDir = `${registry.config.appDir || __dirname}/public/avatars/${req.body.userId}`;
-            exec(`rm -r ${userDir}`, () => {
-                fs.mkdir(userDir, () => {
-                    req.files.avatar.mv(`${userDir}/${req.files.avatar.md5}.png`, function (err) {
-                        if (err) {
-                            log(`fileUpload mv error ${err}`);
-                            return res.status(500).send("FAIL");
-                        }
-                        res.send(req.files.avatar.md5);
-                    });
-                })
-
-            });
-        } else res.status(500).send("Wrong data");
-    });
     app.use("/who-am-i", express.static(`${__dirname}/public`));
     if (registry.config.appDir)
         app.use("/who-am-i", express.static(`${registry.config.appDir}/public`));
     registry.handleAppPage(path, `${__dirname}/public/app.html`);
 
-    class GameState extends EventEmitter {
+    class GameState extends wsServer.users.RoomState {
         constructor(hostId, hostData, userRegistry) {
-            super();
+            super(hostId, hostData, userRegistry);
             const
                 room = {
                     inited: true,
