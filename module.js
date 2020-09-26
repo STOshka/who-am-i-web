@@ -1,14 +1,13 @@
 function init(wsServer, path, vkToken) {
     const
         fs = require("fs"),
-        express = require("express"),
         app = wsServer.app,
         registry = wsServer.users,
         channel = "who-am-i";
 
-    app.use("/who-am-i", express.static(`${__dirname}/public`));
+    app.use("/who-am-i", wsServer.static(`${__dirname}/public`));
     if (registry.config.appDir)
-        app.use("/who-am-i", express.static(`${registry.config.appDir}/public`));
+        app.use("/who-am-i", wsServer.static(`${registry.config.appDir}/public`));
     registry.handleAppPage(path, `${__dirname}/public/app.html`);
 
     class GameState extends wsServer.users.RoomState {
@@ -26,7 +25,8 @@ function init(wsServer, path, vkToken) {
                     rolesLocked: false,
                     playerAvatars: {},
                     roleStickers: {},
-                    currentPlayer: null
+                    currentPlayer: null,
+                    managedVoice: true
                 },
                 state = {
                     roles: {},
@@ -42,7 +42,20 @@ function init(wsServer, path, vkToken) {
                         roles: Object.assign({}, state.roles, {[user]: state.roles[user] ? "**********" : ""})
                     }));
                 },
-                update = () => send(room.onlinePlayers, "state", room),
+                update = () => {
+                    if (room.voiceEnabled)
+                        processUserVoice();
+                    send(room.onlinePlayers, "state", room);
+                },
+                processUserVoice = () => {
+                    room.userVoice = {};
+                    room.onlinePlayers.forEach((user) => {
+                        if (!room.managedVoice || !room.teamsLocked)
+                            room.userVoice[user] = true;
+                        else if (room.players.has(user))
+                            room.userVoice[user] = true;
+                    });
+                },
                 updateState = () => [...room.onlinePlayers].forEach(sendState),
                 removePlayer = (playerId) => {
                     room.players.delete(playerId);
@@ -101,10 +114,12 @@ function init(wsServer, path, vkToken) {
                         registry.log(error.message);
                     }
                 };
+            this.updatePublicState = update;
             this.userJoin = userJoin;
             this.userLeft = userLeft;
             this.userEvent = userEvent;
             this.eventHandlers = {
+                ...this.eventHandlers,
                 "update-avatar": (user, id) => {
                     room.playerAvatars[user] = id;
                     update()

@@ -298,3 +298,11 @@ body {
     background: rgba(255, 252, 245, 0.58);
     box-shadow: 0 0 13px 0 #ff7722;
 }
+
+.user-audio-marker.muted {
+    box-shadow: 0 0 13px 3px #aeaeae99;
+}
+
+.user-audio-marker.speaking {
+    box-shadow: 0 0 13px 3px #9ccc65 !important;
+}

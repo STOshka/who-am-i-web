@@ -14,11 +14,13 @@ class Player extends React.Component {
     render() {
         const
             data = this.props.data,
-            id = this.props.id;
+            id = this.props.id,
+            isSpectator = data.spectators.includes(id);
         return (
             <div className={cs("player", {offline: !~data.onlinePlayers.indexOf(id), self: id === data.userId})}
                  onTouchStart={(e) => e.target.focus()}
                  data-playerId={id}>
+                {isSpectator ? <UserAudioMarker data={data} user={id}/> : ""}
                 {data.playerNames[id]}
                 <div className="player-host-controls">
                     {(data.hostId === data.userId && data.userId !== id) ? (
@@ -28,7 +30,7 @@ class Player extends React.Component {
                             vpn_key
                         </i>
                     ) : ""}
-                    {(data.hostId === data.userId && id !== data.currentPlayer && !~data.spectators.indexOf(id)) ? (
+                    {(data.hostId === data.userId && id !== data.currentPlayer && !isSpectator) ? (
                         <i className="material-icons host-button"
                            title="Set turn"
                            onClick={(evt) => this.props.handleSetPlayer(id, evt)}>
@@ -79,6 +81,7 @@ class Spectators extends React.Component {
 
 class Game extends React.Component {
     componentDidMount() {
+        this.gameName = "who-am-i";
         const initArgs = {};
         if (!localStorage.whoAmIUserId || !localStorage.whoAmIUserToken) {
             while (!localStorage.userName)
@@ -90,7 +93,7 @@ class Game extends React.Component {
             history.replaceState(undefined, undefined, location.origin + location.pathname + "#" + makeId());
         else
             history.replaceState(undefined, undefined, location.origin + location.pathname + location.hash);
-        initArgs.roomId = location.hash.substr(1);
+        initArgs.roomId = this.roomId = location.hash.substr(1);
         initArgs.userId = this.userId = localStorage.whoAmIUserId;
         initArgs.token = this.userToken = localStorage.whoAmIUserToken;
         initArgs.userName = localStorage.userName;
@@ -291,7 +294,10 @@ class Game extends React.Component {
                             {data.players.map(player => (
                                 <div
                                     onTouchStart={(e) => e.target.focus()}
-                                    className={cs("player-container", {"current-player": player === data.currentPlayer})}>
+                                    className={cs("player-container",
+                                        {"current-player": player === data.currentPlayer},
+                                        ...UserAudioMarker.getAudioMarkerClasses(data, player)
+                                        )}>
                                     {data.currentPlayer === player ? (
                                         <i className="turn-marker material-icons">star</i>) : ""}
                                     {player === data.userId
