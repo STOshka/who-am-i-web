@@ -103,7 +103,7 @@ class Game extends React.Component {
             CommonRoom.processCommonRoom(state, this.state);
             clearTimeout(this.timerTimeout);
             if (!this.state.inited && state.inited)
-                this.timerTimeout = setTimeout(() => document.getElementById("background").classList.add("blurred"), 1500);
+                this.timerTimeout = setTimeout(() => document.getElementById("background")?.classList?.add("blurred"), 1500);
             if (this.state.inited && !~this.state.spectators.indexOf(this.userId)
                 && this.state.currentPlayer !== this.userId && state.currentPlayer === this.userId)
                 this.turnSound.play();
@@ -151,9 +151,9 @@ class Game extends React.Component {
                     target.setAttribute('data-y', y);
                 }
             },
-            onstart: (event) => event.target.classList.remove("transition"),
+            onstart: (event) => event?.target?.classList?.remove("transition"),
             onend: (event) => {
-                event.target.classList.add("transition");
+                event?.target?.classList?.add("transition");
                 if (~this.state.players.indexOf(this.state.userId))
                     this.socket.emit("move-role-sticker", event.target.getAttribute("data-id"), {
                         x: event.dx,
