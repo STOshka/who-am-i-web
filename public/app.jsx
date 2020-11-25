@@ -333,10 +333,9 @@ class Game extends React.Component {
                                                autoComplete="off"
                                                type={player === data.userId && data.roles[player] ? "password" : "text"}
                                                disabled={!isPlayer || player === data.userId || data.rolesLocked}
-                                               id={player}
                                                value={(player !== data.userId && ~data.players.indexOf(data.userId))
                                                    ? data.roles[player] : (data.roles[player] ? "**********" : "")}
-                                               onChange={(event => this.handleRoleChange(event.target.id, event.target.value))}/>
+                                               onChange={(event => this.handleRoleChange(player, event.target.value))}/>
                                     </div>
                                 </div>
                             ))}
