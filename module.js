@@ -15,6 +15,7 @@ function init(wsServer, path, vkToken) {
             super(hostId, hostData, userRegistry);
             const
                 room = {
+                    ...this.room,
                     inited: true,
                     hostId: hostId,
                     spectators: new JSONSet(),

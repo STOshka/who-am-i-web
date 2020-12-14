@@ -100,7 +100,11 @@ class Game extends React.Component {
         initArgs.wssToken = window.wssToken;
         this.socket = window.socket.of("who-am-i");
         this.socket.on("state", (state) => {
-            CommonRoom.processCommonRoom(state, this.state);
+            CommonRoom.processCommonRoom(state, this.state, {
+                maxPlayers: "∞",
+                largeImageKey: "who-am-i",
+                details: "Кто я?"
+            });
             clearTimeout(this.timerTimeout);
             if (!this.state.inited && state.inited)
                 this.timerTimeout = setTimeout(() => document.getElementById("background")?.classList?.add("blurred"), 1500);
