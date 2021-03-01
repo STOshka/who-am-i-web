@@ -306,3 +306,8 @@ body {
 .user-audio-marker.speaking {
     box-shadow: 0 0 13px 3px #9ccc65 !important;
 }
+
+.chat-send-input {
+    color: black !important;
+}
+
