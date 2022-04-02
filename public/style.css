@@ -311,3 +311,6 @@ body {
     color: black !important;
 }
 
+.konfa-menu img {
+    filter: brightness(0.1) !important;
+}
