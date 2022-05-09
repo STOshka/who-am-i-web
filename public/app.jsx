@@ -301,7 +301,7 @@ class Game extends React.Component {
                                     className={cs("player-container",
                                         {"current-player": player === data.currentPlayer},
                                         ...UserAudioMarker.getAudioMarkerClasses(data, player)
-                                        )}>
+                                    )}>
                                     {data.currentPlayer === player ? (
                                         <i className="turn-marker material-icons">star</i>) : ""}
                                     {player === data.userId
@@ -337,7 +337,7 @@ class Game extends React.Component {
                                                autoComplete="off"
                                                type={player === data.userId && data.roles[player] ? "password" : "text"}
                                                disabled={!isPlayer || player === data.userId || data.rolesLocked}
-                                               value={(player !== data.userId && ~data.players.indexOf(data.userId))
+                                               value={(player !== data.userId && (~data.players.indexOf(data.userId) || data.hostId === data.userId))
                                                    ? data.roles[player] : (data.roles[player] ? "**********" : "")}
                                                onChange={(event => this.handleRoleChange(player, event.target.value))}/>
                                     </div>
