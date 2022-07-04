@@ -11,8 +11,8 @@ function init(wsServer, path, vkToken) {
     registry.handleAppPage(path, `${__dirname}/public/app.html`);
 
     class GameState extends wsServer.users.RoomState {
-        constructor(hostId, hostData, userRegistry) {
-            super(hostId, hostData, userRegistry);
+        constructor(hostId, hostData, userRegistry, registry) {
+            super(hostId, hostData, userRegistry, registry.games.whoAmI.id, path);
             const
                 room = {
                     ...this.room,
@@ -135,11 +135,6 @@ function init(wsServer, path, vkToken) {
                         room.rolesLocked = !room.rolesLocked;
                     update();
                 },
-                "change-name": (user, value) => {
-                    if (value)
-                        room.playerNames[user] = value.substr && value.substr(0, 60);
-                    update();
-                },
                 "remove-player": (user, playerId) => {
                     if (playerId && user === room.hostId)
                         removePlayer(playerId);
@@ -241,7 +236,7 @@ function init(wsServer, path, vkToken) {
         }
     }
 
-    registry.createRoomManager(path, channel, GameState);
+    registry.createRoomManager(path, GameState);
 }
 
 module.exports = init;
