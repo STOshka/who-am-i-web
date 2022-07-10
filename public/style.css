@@ -314,3 +314,7 @@ body {
 .konfa-menu img {
     filter: brightness(0.1) !important;
 }
+
+.has-room-image #background {
+    display: none;
+}
