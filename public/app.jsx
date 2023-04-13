@@ -20,7 +20,7 @@ class Player extends React.Component {
             <div className={cs("player", {offline: !~data.onlinePlayers.indexOf(id), self: id === data.userId})}
                  onTouchStart={(e) => e.target.focus()}
                  data-playerId={id}>
-                {isSpectator ? <UserAudioMarker data={data} user={id}/> : ""}
+                {isSpectator ? <UserAudioMarker data={data} user={id} /> : ""}
                 <PlayerName data={data} id={id} />
                 <div className="player-host-controls">
                     {(data.hostId === data.userId && data.userId !== id) ? (
@@ -71,7 +71,7 @@ class Spectators extends React.Component {
                     data.spectators.length ? data.spectators.map(
                         (player, index) => (<Player key={index} data={data} id={player}
                                                     handleRemovePlayer={this.props.handleRemovePlayer}
-                                                    handleGiveHost={this.props.handleGiveHost}/>)
+                                                    handleGiveHost={this.props.handleGiveHost} />),
                     ) : " ..."
                 }
             </div>
@@ -87,7 +87,7 @@ class Game extends React.Component {
             CommonRoom.processCommonRoom(state, this.state, {
                 maxPlayers: "∞",
                 largeImageKey: "who-am-i",
-                details: "Кто я?"
+                details: "Кто я?",
             }, this);
             clearTimeout(this.timerTimeout);
             if (!this.state.inited && state.inited)
@@ -98,7 +98,7 @@ class Game extends React.Component {
             this.setState(Object.assign({
                 userId: this.userId,
                 roles: this.state.roles || {},
-                playerNotes: this.state.playerNotes || {}
+                playerNotes: this.state.playerNotes || {},
             }, state));
         });
         this.socket.on("player-state", (state) => {
@@ -112,7 +112,7 @@ class Game extends React.Component {
             this.setState({
                 inited: false,
                 disconnected: true,
-                disconnectReason: event.reason
+                disconnectReason: event.reason,
             });
         });
         document.title = `Who am I - ${initArgs.roomId}`;
@@ -125,7 +125,7 @@ class Game extends React.Component {
             restrict: {
                 restriction: 'parent',
                 endOnly: true,
-                elementRect: {left: 0, right: 1, top: 0, bottom: 1}
+                elementRect: {left: 0, right: 1, top: 0, bottom: 1},
             },
             onmove: (event) => {
                 if (~this.state.players.indexOf(this.state.userId)) {
@@ -141,13 +141,14 @@ class Game extends React.Component {
             },
             onstart: (event) => event?.target?.classList?.remove("transition"),
             onend: (event) => {
+                const user = event.target.getAttribute("data-id");
                 event?.target?.classList?.add("transition");
                 if (~this.state.players.indexOf(this.state.userId))
                     this.socket.emit("move-role-sticker", event.target.getAttribute("data-id"), {
                         x: event.dx,
-                        y: event.dy
+                        y: event.dy,
                     });
-            }
+            },
         });
         this.socket.on("prompt-delete-prev-room", (roomList) => {
             if (localStorage.acceptDelete =
@@ -167,23 +168,49 @@ class Game extends React.Component {
     constructor() {
         super();
         this.state = {
-            inited: false
+            inited: false,
         };
     }
 
     handleRoleChange(id, value) {
-        this.socket.emit("change-word", id, value);
+        if (this.state.roles[id] !== false && this.state.roles[id] !== null) {
+            this.state.roles[id] = value;
+            this.setState(this.state);
+            this.debouncedEmit("change-word", id, value);
+        }
     }
 
     handleNotesChange(id, value) {
+        this.state.playerNotes[id] = value;
+        this.setState(this.state);
         this.debouncedEmit("change-notes", id, value);
+    }
+
+    storeDimensions(e, player) {
+        const element = e.target;
+        if (this.state.roles[player] === null || this.state.roles[player] === false)
+            setTimeout(() => element.blur(), 0);
+        element.textWidth = element.offsetWidth;
+        element.textHeight = element.offsetHeight;
+    }
+
+    onResizeMaybe(e) {
+        const element = e.target;
+        const user = e.target.getAttribute("data-id");
+        if (!(element.textWidth === element.offsetWidth
+            && element.textHeight === element.offsetHeight)) {
+            this.socket.emit("resize-role-sticker", user, {
+                w: element.offsetWidth,
+                h: element.offsetHeight,
+            });
+        }
     }
 
     debouncedEmit(event, a1, a2) {
         clearTimeout(this.debouncedEmitTimer);
         this.debouncedEmitTimer = setTimeout(() => {
             this.socket.emit(event, a1, a2);
-        }, 1000);
+        }, 300);
     }
 
     handleRemovePlayer(id, evt) {
@@ -250,8 +277,8 @@ class Game extends React.Component {
                 parentDir = location.pathname.match(/(.+?)\//)[1];
             return (
                 <div className="game">
-                    <CommonRoom state={this.state} app={this}/>
-                    <div id="background"/>
+                    <CommonRoom state={this.state} app={this} />
+                    <div id="background" />
                     <div className={cs("game-board", {active: this.state.inited})}>
                         <div className="player-list">
                             {data.players.map(player => (
@@ -259,7 +286,7 @@ class Game extends React.Component {
                                     onTouchStart={(e) => e.target.focus()}
                                     className={cs("player-container",
                                         {"current-player": player === data.currentPlayer},
-                                        ...UserAudioMarker.getAudioMarkerClasses(data, player)
+                                        ...UserAudioMarker.getAudioMarkerClasses(data, player),
                                     )}>
                                     {data.currentPlayer === player ? (
                                         <i className="turn-marker material-icons">star</i>) : ""}
@@ -277,26 +304,34 @@ class Game extends React.Component {
                                         </div>)}
                                     <div className="avatar"
                                          style={{
-                                             "background-image": `url(${window.commonRoom?.getPlayerAvatarURL(player) ? window.commonRoom?.getPlayerAvatarURL(player) : '/who-am-i/default-user.png'})`
-                                         }}/>
+                                             "background-image": `url(${window.commonRoom?.getPlayerAvatarURL(player) ? window.commonRoom?.getPlayerAvatarURL(player) : '/who-am-i/default-user.png'})`,
+                                         }} />
                                     <Player id={player} data={data}
                                             handleSetPlayer={(id, evt) => this.handleSetPlayer(id, evt)}
                                             handleRemovePlayer={(id, evt) => this.handleRemovePlayer(id, evt)}
-                                            handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)}/>
+                                            handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)} />
                                     <div
-                                        className="draggable role-container transition"
+                                        className={cs('draggable role-container transition',
+                                            {
+                                                hiddenFilled: data.roles[player] === false,
+                                                disabled: !isPlayer || player === data.userId || data.rolesLocked,
+                                            })}
                                         data-id={player}
                                         style={{transform: `translate(${data.roleStickers[player].x}px, ${data.roleStickers[player].y}px)`}}
                                         data-x={data.roleStickers[player].x}
                                         data-y={data.roleStickers[player].y}
                                     >
-                                        <input className="role"
-                                               autoComplete="off"
-                                               type={player === data.userId && data.roles[player] ? "password" : "text"}
-                                               disabled={!isPlayer || player === data.userId || data.rolesLocked}
-                                               value={(player !== data.userId && (~data.players.indexOf(data.userId) || data.hostId === data.userId))
-                                                   ? data.roles[player] : (data.roles[player] ? "**********" : "")}
-                                               onChange={(event => this.handleRoleChange(player, event.target.value))}/>
+                                        <textarea
+                                            className="role"
+                                            style={{
+                                                width: `${data.roleStickersSize[player].w}px`,
+                                                height: `${data.roleStickersSize[player].h}px`,
+                                            }}
+                                            data-id={player}
+                                            onMouseDown={(e) => this.storeDimensions(e, player)}
+                                            onMouseUp={(e) => this.onResizeMaybe(e)}
+                                            value={data.roles[player] ? data.roles[player] : ''}
+                                            onChange={(event => this.handleRoleChange(player, event.target.value))} />
                                     </div>
                                 </div>
                             ))}
@@ -309,7 +344,7 @@ class Game extends React.Component {
                         <textarea id="notebook"
                                   placeholder="notes"
                                   defaultValue={data.playerNotes[data.userId]}
-                                  onChange={(event => this.handleNotesChange(event.target.value))}/>
+                                  onChange={(event => this.handleNotesChange(event.target.value))} />
                         </div>) : ""}
                         {data.currentPlayer === data.userId ? (
                             <div className="end-turn-button" onClick={() => this.handleClickEndTurn()}>End
@@ -319,7 +354,7 @@ class Game extends React.Component {
                             <Spectators data={this.state}
                                         handleSpectatorsClick={() => this.handleSpectatorsClick()}
                                         handleRemovePlayer={(id, evt) => this.handleRemovePlayer(id, evt)}
-                                        handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)}/>
+                                        handleGiveHost={(id, evt) => this.handleGiveHost(id, evt)} />
                         </div>
                         <div className="host-controls" onTouchStart={(e) => e.target.focus()}>
                             <div className="side-buttons">
@@ -344,8 +379,8 @@ class Game extends React.Component {
                     </div>
                 </div>
             );
-        } else return (<div/>);
+        } else return (<div />);
     }
 }
 
-ReactDOM.render(<Game/>, document.getElementById('root'));
+ReactDOM.render(<Game />, document.getElementById('root'));

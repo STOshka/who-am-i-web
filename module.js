@@ -26,12 +26,13 @@ function init(wsServer, path, vkToken) {
                     rolesLocked: false,
                     playerAvatars: {},
                     roleStickers: {},
+                    roleStickersSize: {},
                     currentPlayer: null,
-                    managedVoice: true
+                    managedVoice: true,
                 },
                 state = {
                     roles: {},
-                    playerNotes: {}
+                    playerNotes: {},
                 };
             this.room = room;
             this.state = state;
@@ -40,7 +41,7 @@ function init(wsServer, path, vkToken) {
                 send = (target, event, data1) => userRegistry.send(target, event, data1),
                 sendState = (user) => {
                     send(user, "player-state", Object.assign({}, {
-                        roles: Object.assign({}, state.roles, {[user]: state.roles[user] ? "**********" : ""})
+                        roles: Object.assign({}, state.roles, {[user]: state.roles[user] ? false : null}),
                     }));
                 },
                 update = () => {
@@ -87,11 +88,12 @@ function init(wsServer, path, vkToken) {
                     room.onlinePlayers.add(user);
                     room.playerNames[user] = data.userName.substr && data.userName.substr(0, 60);
                     room.roleStickers[user] = room.roleStickers[user] || {x: 0, y: 0};
+                    room.roleStickersSize[user] = room.roleStickersSize[user] || {w: 108, h: 38};
                     if (data.avatarId) {
                         fs.stat(`${registry.config.appDir || __dirname}/public/avatars/${user}/${data.avatarId}.png`, (err) => {
                             if (!err) {
                                 room.playerAvatars[user] = data.avatarId;
-                                update()
+                                update();
                             }
                         });
                     }
@@ -123,7 +125,7 @@ function init(wsServer, path, vkToken) {
                 ...this.eventHandlers,
                 "update-avatar": (user, id) => {
                     room.playerAvatars[user] = id;
-                    update()
+                    update();
                 },
                 "toggle-lock": (user) => {
                     if (user === room.hostId)
@@ -180,7 +182,21 @@ function init(wsServer, path, vkToken) {
                 "move-role-sticker": (user, player, position) => {
                     if (room.players.has(user) && room.players.has(player)) {
                         const prevPosition = room.roleStickers[player];
-                        room.roleStickers[player] = {x: prevPosition.x + position.x, y: prevPosition.y + position.y};
+                        room.roleStickers[player] =
+                            {
+                                x: prevPosition.x + position.x,
+                                y: prevPosition.y + position.y,
+                            };
+                    }
+                    update();
+                },
+                "resize-role-sticker": (user, player, size) => {
+                    if (room.players.has(user) && room.players.has(player)) {
+                        room.roleStickersSize[player] =
+                            {
+                                h: size.h,
+                                w: size.w,
+                            };
                     }
                     update();
                 },
@@ -193,7 +209,7 @@ function init(wsServer, path, vkToken) {
                     if (room.currentPlayer === user)
                         nextPlayer();
                     update();
-                }
+                },
             };
         }
 
@@ -212,7 +228,7 @@ function init(wsServer, path, vkToken) {
         getSnapshot() {
             return {
                 room: this.room,
-                state: this.state
+                state: this.state,
             };
         }
 
@@ -228,11 +244,11 @@ function init(wsServer, path, vkToken) {
 
     class JSONSet extends Set {
         constructor(iterable) {
-            super(iterable)
+            super(iterable);
         }
 
         toJSON() {
-            return [...this]
+            return [...this];
         }
     }
 

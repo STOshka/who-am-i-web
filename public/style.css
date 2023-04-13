@@ -94,6 +94,7 @@
     width: 93px;
     background: none;
     border: none;
+    transition: width, height 0.3s;
 }
 
 .notebook {
@@ -126,7 +127,7 @@
 .role-container {
     position: absolute;
     padding: 7px;
-    left: 43px;
+    left: 36px;
     top: 8px;
     box-shadow: 0 0 5px 1px black;
     background: rgb(255, 239, 201);
@@ -317,4 +318,24 @@ body {
 
 .has-room-image #background {
     display: none;
+}
+
+.role-container.hiddenFilled:after {
+    content: '?';
+    position: absolute;
+    font-size: 40px;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 0;
+    right: 0;
+    color: gray;
+    pointer-events: none;
+}
+
+.role-container.disabled textarea {
+    cursor: default;
+    outline: none;
 }
