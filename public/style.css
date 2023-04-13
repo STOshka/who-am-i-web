@@ -94,7 +94,6 @@
     width: 93px;
     background: none;
     border: none;
-    transition: width, height 0.3s;
 }
 
 .notebook {
