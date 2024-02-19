@@ -40,14 +40,21 @@ function init(wsServer, path, vkToken) {
             const
                 send = (target, event, data1) => userRegistry.send(target, event, data1),
                 sendState = (user) => {
-                    send(user, "player-state", Object.assign({}, {
-                        roles: Object.assign({}, state.roles, {[user]: state.roles[user] ? false : null}),
-                    }));
+                    const res = {
+                        roles: Object.keys(state.roles).reduce((acc, cur) => {
+                            acc[cur] = (user === cur || !room.players.has(user))
+                                ? state.roles[cur] ? false : null
+                                : state.roles[cur];
+                            return acc;
+                        }, {}),
+                    };
+                    send(user, "player-state", res);
                 },
                 update = () => {
                     if (room.voiceEnabled)
                         processUserVoice();
                     send(room.onlinePlayers, "state", room);
+                    updateState();
                 },
                 processUserVoice = () => {
                     room.userVoice = {};
