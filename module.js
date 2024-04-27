@@ -187,7 +187,7 @@ function init(wsServer, path, vkToken) {
                     send(user, "notes", {user: userNote, note: state.playerNotes[userNote]});
                 },
                 "move-role-sticker": (user, player, position) => {
-                    if (room.players.has(user) && room.players.has(player)) {
+                    if (room.players.has(user) && room.players.has(player) && !room.rolesLocked) {
                         const prevPosition = room.roleStickers[player];
                         room.roleStickers[player] =
                             {
@@ -198,7 +198,7 @@ function init(wsServer, path, vkToken) {
                     update();
                 },
                 "resize-role-sticker": (user, player, size) => {
-                    if (room.players.has(user) && room.players.has(player)) {
+                    if (room.players.has(user) && room.players.has(player) && !room.rolesLocked) {
                         room.roleStickersSize[player] =
                             {
                                 h: size.h,
