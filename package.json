@@ -3,9 +3,30 @@
   "version": "0.0.0",
   "main": "module.js",
   "private": true,
-  "files": [
-    "module.js",
-    "public"
-  ],
-  "dependencies": {}
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "lint": "eslint . --ext .ts,.tsx,.vue --fix"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3",
+    "ws-server-engine": "file:../ws-server-engine"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/socket.io": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-vue": "^9.27.0",
+    "ts-loader": "^9.5.1",
+    "vue-eslint-parser": "^9.4.3",
+    "webpack": "^5.93.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
+  }
 }

@@ -1,0 +1,29 @@
+{
+  "name": "chat-app",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build --emptyOutDir",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@interactjs/actions": "^1.10.27",
+    "@interactjs/auto-start": "^1.10.27",
+    "@interactjs/dev-tools": "^1.10.27",
+    "@interactjs/inertia": "^1.10.27",
+    "@interactjs/interact": "^1.10.27",
+    "@interactjs/modifiers": "^1.10.27",
+    "interactjs": "^1.10.27",
+    "socket.io-client": "^4.7.5",
+    "vue": "^3.4.31"
+  },
+  "devDependencies": {
+    "@types/socket.io-client": "^3.0.0",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "prettier": "^3.3.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.4",
+    "vue-tsc": "^2.0.24"
+  }
+}
