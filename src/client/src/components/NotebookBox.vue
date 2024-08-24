@@ -3,7 +3,7 @@
     <textarea
       id="notebook"
       v-model="inputValue"
-      placeholder="notes"
+      :placeholder="getLocaleText('notes')"
       @keyup="handleNotebookChange"
     ></textarea>
   </div>
@@ -12,9 +12,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useGameLogic } from '../gameLogic.ts';
+import { getLocaleText } from '../locale.ts';
+
 const { state, service } = useGameLogic();
 
-const inputValue = ref(state.playerNotes?.[state.userId]);
+const inputValue = ref(state.playerNotes?.[state.userId] || '');
 
 const handleNotebookChange = (event: KeyboardEvent) => {
   const target = event.target as HTMLTextAreaElement;

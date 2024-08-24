@@ -7,7 +7,7 @@
     @click="service.spectatorsJoin()"
   >
     <div class="spectators">
-      Spectators:
+      {{ getLocaleText('spectators') }}
       <template v-if="spectatorsList.length > 0">
         <PlayerName
           v-for="(player, index) in spectatorsList"
@@ -24,6 +24,7 @@
 import { computed } from 'vue';
 import { useGameLogic } from '../gameLogic.ts';
 import PlayerName from './Player/PlayerName.vue';
+import { getLocaleText } from '../locale.ts';
 const { state, service } = useGameLogic();
 
 const spectatorsList = computed(() => Array.from(state.spectators || []));

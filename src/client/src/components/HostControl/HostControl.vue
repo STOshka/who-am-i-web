@@ -16,6 +16,7 @@ import { computed } from 'vue';
 import { useGameLogic } from '../../gameLogic.ts';
 import { MenuButton } from '../../../../common/interfaces';
 import HostControlItem from './HostControlItem.vue';
+import { switchToNextLocale } from '../../locale.ts';
 
 const { state, service, commonRoom } = useGameLogic();
 
@@ -26,6 +27,12 @@ const controlButtons = computed<MenuButton[]>(() => {
       msg: state.rolesLocked ? 'label_off' : 'label',
       isHost: true,
       onClick: () => service.toggleRoleLock(),
+    },
+    {
+      class: 'material-icons',
+      msg: 'language',
+      isHost: false,
+      onClick: () => switchToNextLocale(),
     },
     {
       class: 'material-icons',

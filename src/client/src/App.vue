@@ -9,7 +9,7 @@
         class="end-turn-button"
         @click="service.endTurn()"
       >
-        End turn
+        {{ getLocaleText('endTurn') }}
       </div>
       <NotebookBox v-if="state.players?.has(state.userId)" />
       <HostControl />
@@ -23,6 +23,7 @@ import SpectatorsList from './components/SpectatorsList.vue';
 import PlayerList from './components/PlayerList.vue';
 import NotebookBox from './components/NotebookBox.vue';
 import HostControl from './components/HostControl/HostControl.vue';
+import { getLocaleText } from './locale.ts';
 import './style.css';
 const { state, service } = useGameLogic();
 
