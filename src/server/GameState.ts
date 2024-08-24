@@ -165,11 +165,17 @@ export function createGameState(
     }
 
     userEventHandler(user: string, event: keyof RoomEvents, args: unknown[]) {
-      if (this.eventHandlers[event]) {
-        this.eventHandlers[event](user, ...args);
+      const specialCases: Record<string, keyof RoomEvents> = {
+        'give-host': 'giveHost',
+        'remove-player': 'removePlayer',
+        'change-name': 'changeName',
+      };
+      const normalizedEvent = specialCases[event] || event;
+      if (this.eventHandlers[normalizedEvent]) {
+        this.eventHandlers[normalizedEvent](user, ...args);
       }
       const handleEvent = new UserEventHandler(this, user);
-      const eventHandler = handleEvent[event as keyof RoomEvents] as (
+      const eventHandler = handleEvent[normalizedEvent as keyof RoomEvents] as (
         ...args: unknown[]
       ) => void;
       if (typeof eventHandler === 'function') {

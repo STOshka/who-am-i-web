@@ -24,7 +24,7 @@ import { defineProps, computed } from 'vue';
 import { useGameLogic } from '../../gameLogic.ts';
 import PlayerControlItem from './PlayerControl.vue';
 import { PlayerButton } from '../../../../common/interfaces';
-const { state, service } = useGameLogic();
+const { state, service, commonRoom } = useGameLogic();
 
 const props = defineProps<{
   player: string;
@@ -50,13 +50,14 @@ const controlButtons = computed<PlayerButton[]>(() => [
     title: 'Give host',
     icon: 'vpn_key',
     isShow: isHostIsYou.value && !isHostThisUser.value,
-    onClick: () => service.giveHost(props.player),
+    onClick: (evt: MouseEvent) => commonRoom.handleGiveHost(props.player, evt),
   },
   {
     title: 'Remove',
     icon: 'delete_forever',
     isShow: isHostIsYou.value && !isHostThisUser.value,
-    onClick: () => service.removePlayer(props.player),
+    onClick: (evt: MouseEvent) =>
+      commonRoom.handleRemovePlayer(props.player, evt),
   },
 ]);
 

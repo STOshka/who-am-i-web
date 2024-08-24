@@ -17,7 +17,7 @@ import { useGameLogic } from '../../gameLogic.ts';
 import { MenuButton } from '../../../../common/interfaces';
 import HostControlItem from './HostControlItem.vue';
 
-const { state, service } = useGameLogic();
+const { state, service, commonRoom } = useGameLogic();
 
 const controlButtons = computed<MenuButton[]>(() => {
   return [
@@ -37,11 +37,7 @@ const controlButtons = computed<MenuButton[]>(() => {
       class: 'material-icons toggle-theme',
       msg: 'edit',
       isHost: false,
-      onClick: () => {
-        const name = prompt('New name') || '';
-        service.changeName(name);
-        localStorage.userName = name;
-      },
+      onClick: () => commonRoom.handleClickChangeName(),
     },
   ];
 });

@@ -14,7 +14,3 @@ export const makeId = (): string => {
     .map(() => possible.charAt(Math.floor(Math.random() * possible.length)))
     .join('');
 };
-
-export const CONSTANT = {
-  PORT: 3000,
-};

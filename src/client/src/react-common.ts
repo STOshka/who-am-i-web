@@ -9,8 +9,10 @@ export interface ReactAppWindow<GameState> extends Window {
   gameApp: { userId: string };
   commonRoom: {
     getPlayerAvatarURL: (playerId: string) => string;
-    getPlayerName: (playerId: string) => string;
     handleClickSetImage: (imageType: string) => void;
+    handleRemovePlayer: (playerId: string, evt: MouseEvent) => void;
+    handleGiveHost: (playerId: string, evt: MouseEvent) => void;
+    handleClickChangeName: () => void;
   };
 }
 

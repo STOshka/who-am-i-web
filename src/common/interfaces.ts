@@ -38,5 +38,5 @@ export interface PlayerButton {
   title: string;
   icon: string;
   isShow: boolean;
-  onClick?: () => void;
+  onClick?: (evt: MouseEvent) => void;
 }

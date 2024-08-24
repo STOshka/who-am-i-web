@@ -67,9 +67,5 @@ export const useGameLogic = () => {
     initialized = true;
     initGame();
   }
-  return {
-    state: state.value,
-    service,
-    commonRoom: commonRoom(),
-  };
+  return { state: state.value, service, commonRoom: commonRoom() };
 };
