@@ -1,5 +1,5 @@
-import { RoomState, WSServer } from '../common/commonType';
-import { createGameState } from './GameState';
+import { WSServer } from '../common/commonType';
+import { createGameState } from './WhoAmIState';
 
 function init(wsServer: WSServer, path: string) {
   const app = wsServer.app;
@@ -10,13 +10,13 @@ function init(wsServer: WSServer, path: string) {
     app.use('/who-am-i', wsServer.static(`${registry.config.appDir}/public`));
   registry.handleAppPage(path, `${__dirname}/public/index.html`);
 
-  const GameState = createGameState(
+  const WhoAmIState = createGameState(
     wsServer.users.RoomState,
     registry.games.whoAmI.id,
     path
   );
 
-  registry.createRoomManager(path, GameState as unknown as RoomState);
+  registry.createRoomManager(path, WhoAmIState);
 }
 
 module.exports = init;

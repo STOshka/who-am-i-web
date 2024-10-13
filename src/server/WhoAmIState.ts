@@ -8,20 +8,21 @@ import {
 import { SendData, WhoAmIRoom, WhoAmIState } from '../common/gameType';
 import { JSONSet } from '../common/utils';
 import { Roles, RoomEvents } from '../common/interfaces';
-import { UserEventHandler } from './UserEvent';
+import { UserEventHandler } from './WhoAmIUserEvent';
 
 export function createGameState(
   RoomState: RegistryRoomState,
   id: string,
   path: string
 ) {
-  class GameState extends RoomState {
+  class WhoAmIGameState extends RoomState {
     state: WhoAmIState;
+    room: WhoAmIRoom;
 
     constructor(hostId: string, hostData: JoinData, userRegistry: Registry) {
       super(hostId, hostData, userRegistry, id, path);
       this.room = {
-        ...this.room,
+        ...(this as any).room, //TODO: copy Lanau -> cho za fignya?
         inited: true,
         hostId,
         spectators: new JSONSet(),
@@ -45,10 +46,6 @@ export function createGameState(
       this.userJoin = this.userJoin.bind(this);
       this.userLeft = this.userLeftHandler.bind(this);
       this.userEvent = this.userEventHandler.bind(this);
-    }
-
-    get game() {
-      return this.room as WhoAmIRoom;
     }
 
     send(target: string | JSONSet<string>, event: string, data: SendData) {
@@ -76,7 +73,7 @@ export function createGameState(
         this.processUserVoice();
       }
       this.room.onlinePlayers.forEach((playerId) =>
-        this.send(playerId, 'state', this.game)
+        this.send(playerId, 'state', this.room)
       );
       this.updateState();
     }
@@ -92,29 +89,29 @@ export function createGameState(
     }
 
     updateState() {
-      [...this.game.onlinePlayers].forEach((user) => this.sendState(user));
+      [...this.room.onlinePlayers].forEach((user) => this.sendState(user));
     }
 
     removePlayer(playerId: string) {
-      this.game.players.delete(playerId);
+      this.room.players.delete(playerId);
       if (
-        this.game.spectators.has(playerId) ||
-        !this.game.onlinePlayers.has(playerId)
+        this.room.spectators.has(playerId) ||
+        !this.room.onlinePlayers.has(playerId)
       ) {
-        this.game.spectators.delete(playerId);
-        delete this.game.playerNames[playerId];
+        this.room.spectators.delete(playerId);
+        delete this.room.playerNames[playerId];
         this.emit('user-kicked', playerId);
       } else {
-        if (this.game.currentPlayer === playerId) {
+        if (this.room.currentPlayer === playerId) {
           this.nextPlayer();
         }
-        this.game.spectators.add(playerId);
+        this.room.spectators.add(playerId);
       }
     }
 
     nextPlayer() {
       const playersArray = [...this.room.players];
-      const currentPlayerIndex = playersArray.indexOf(this.game.currentPlayer!);
+      const currentPlayerIndex = playersArray.indexOf(this.room.currentPlayer!);
 
       if (
         currentPlayerIndex === -1 ||
@@ -128,16 +125,16 @@ export function createGameState(
 
     userJoin(data: JoinData) {
       const user = data.userId;
-      if (!this.game.playerNames[user]) {
-        this.game.spectators.add(user);
+      if (!this.room.playerNames[user]) {
+        this.room.spectators.add(user);
       }
-      this.game.onlinePlayers.add(user);
-      this.game.playerNames[user] = data.userName.substring(0, 60);
-      this.game.roleStickers[user] = this.game.roleStickers[user] || {
+      this.room.onlinePlayers.add(user);
+      this.room.playerNames[user] = data.userName.substring(0, 60);
+      this.room.roleStickers[user] = this.room.roleStickers[user] || {
         x: 0,
         y: 0,
       };
-      this.game.roleStickersSize[user] = this.game.roleStickersSize[user] || {
+      this.room.roleStickersSize[user] = this.room.roleStickersSize[user] || {
         w: 108,
         h: 38,
       };
@@ -146,7 +143,7 @@ export function createGameState(
         const avatarPath = `${this.registry.config.appDir || __dirname}/public/avatars/${user}/${data.avatarId}.png`;
         fs.stat(avatarPath, (err) => {
           if (!err) {
-            this.game.playerAvatars[user] = data.avatarId!;
+            this.room.playerAvatars[user] = data.avatarId!;
             this.update();
           }
         });
@@ -156,11 +153,11 @@ export function createGameState(
     }
 
     userLeftHandler(user: string) {
-      this.game.onlinePlayers.delete(user);
-      if (this.game.spectators.has(user)) {
-        delete this.game.playerNames[user];
+      this.room.onlinePlayers.delete(user);
+      if (this.room.spectators.has(user)) {
+        delete this.room.playerNames[user];
       }
-      this.game.spectators.delete(user);
+      this.room.spectators.delete(user);
       this.update();
     }
 
@@ -172,7 +169,7 @@ export function createGameState(
       };
       const normalizedEvent = specialCases[event] || event;
       if (this.eventHandlers[normalizedEvent]) {
-        this.eventHandlers[normalizedEvent](user, ...args);
+        return this.eventHandlers[normalizedEvent](user, ...args);
       }
       const handleEvent = new UserEventHandler(this, user);
       const eventHandler = handleEvent[normalizedEvent as keyof RoomEvents] as (
@@ -184,11 +181,11 @@ export function createGameState(
     }
 
     getPlayerCount(): number {
-      return Object.keys(this.game.playerNames).length;
+      return Object.keys(this.room.playerNames).length;
     }
 
     getActivePlayerCount(): number {
-      return this.game.onlinePlayers.size;
+      return this.room.onlinePlayers.size;
     }
 
     getLastInteraction(): Date {
@@ -197,22 +194,22 @@ export function createGameState(
 
     getSnapshot(): Snapshot {
       return {
-        room: this.game,
+        room: this.room,
         state: this.state,
       };
     }
 
     setSnapshot(snapshot: Snapshot) {
-      Object.assign(this.game, snapshot.room);
+      Object.assign(this.room, snapshot.room);
       Object.assign(this.state, snapshot.state);
-      this.game.onlinePlayers = new JSONSet();
-      this.game.spectators = new JSONSet();
-      this.game.players = new JSONSet(this.game.players);
-      this.game.onlinePlayers.clear();
+      this.room.onlinePlayers = new JSONSet();
+      this.room.spectators = new JSONSet();
+      this.room.players = new JSONSet(this.room.players);
+      this.room.onlinePlayers.clear();
     }
   }
 
-  return GameState;
+  return WhoAmIGameState;
 }
 
-export type GameStateType = ReturnType<typeof createGameState>;
+export type WhoAmIGameStateType = ReturnType<typeof createGameState>;

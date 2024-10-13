@@ -70,8 +70,12 @@ export interface Registry {
   ): void;
   send(target: JSONSet<string> | string, event: string, data: object): void;
   log(message: string): void;
-  createRoomManager(path: string, gameState: RoomState): void;
+  createRoomManager(path: string, gameState: RoomStateClass): void;
   RoomState: RegistryRoomState;
+}
+
+export interface RoomStateClass {
+  new (hostId: string, hostData: JoinData, userRegistry: Registry): RoomState;
 }
 
 export interface JoinData {

@@ -1,18 +1,18 @@
 import { StickerPosition, StickerSize, WhoAmIRoom } from '../common/gameType';
 import { RoomEvents } from '../common/interfaces';
-import { GameStateType } from './GameState';
+import { WhoAmIGameStateType } from './WhoAmIState';
 
 export class UserEventHandler implements RoomEvents {
-  game: InstanceType<GameStateType>;
+  game: InstanceType<WhoAmIGameStateType>;
   user: string;
 
-  constructor(game: InstanceType<GameStateType>, user: string) {
+  constructor(game: InstanceType<WhoAmIGameStateType>, user: string) {
     this.game = game;
     this.user = user;
   }
 
-  get room() {
-    return this.game.room as WhoAmIRoom;
+  get room(): WhoAmIRoom {
+    return this.game.room;
   }
 
   isHost(): boolean {
