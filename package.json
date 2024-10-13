@@ -4,7 +4,7 @@
   "main": "module.js",
   "private": true,
   "scripts": {
-    "build-project": "npm run build-server && cd ./src/client && npm run build",
+    "build-project": "cd ./src/client && npm i && npm run build && cd ../../ && npm run build-server",
     "build-server": "webpack --config webpack.config.js",
     "lint": "eslint . --ext .ts,.tsx,.vue,.json --fix",
     "postinstall": "npm run build-project"
