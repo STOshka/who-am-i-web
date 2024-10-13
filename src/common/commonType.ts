@@ -1,10 +1,9 @@
-import { Application, static as static_ } from 'express';
 import { JSONSet } from './utils';
 
 export interface WSServer {
-  app: Application;
+  app: any; //TODO: CHECK
   users: Registry;
-  static: typeof static_;
+  static: any; //TODO: CHECK
 }
 
 export interface CommonRoom {
