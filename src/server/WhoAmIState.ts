@@ -22,7 +22,7 @@ export function createGameState(
     constructor(hostId: string, hostData: JoinData, userRegistry: Registry) {
       super(hostId, hostData, userRegistry, id, path);
       this.room = {
-        ...(this as any).room, //TODO: copy Lanau -> cho za fignya?
+        ...this!.room,
         inited: true,
         hostId,
         spectators: new JSONSet(),
